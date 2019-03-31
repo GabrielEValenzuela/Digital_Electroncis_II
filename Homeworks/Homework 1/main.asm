@@ -1,0 +1,36 @@
+; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+; TITLE : EXERCISE 2.1
+; AUTHOR: VALENZUELA GABRIEL EMANUEL
+; SUBJET: DIGITAL ELECTRONICS I I
+; INSTITUTE : FEFYN ¡ UNC
+; DATE: 03¡23¡2019
+; VERSION: 1. 0.0
+;
+; RESUME:
+; THIS PROGRAM ADD TO VALUES ON 0X21 AND 0X22
+; AFTER STORE THE RESULT ON 0X23 AND 0X24
+; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+#include "p16f887.inc"
+LIST P=16F887
+; CONFIG1
+; __conf ig 0xFFF7
+__CONFIG _CONFIG1, _FOSC_EXTRC_CLKOUT & _WDTE_OFF & _PWRTE_OFF & _MCLRE_ON & _CP_OFF & _CPD_OFF & _BOREN_ON & _IESO_ON & _FCMEN_ON & _LVP_ON
+; CONFIG2
+; __conf ig 0xFFFF
+__CONFIG _CONFIG2, _BOR4V_BOR40V & _WRT_OFF
+ORG 0x0 ;ORIGIN
+GOTO PROGRAM ; SAVE THE POSITION 0X04
+CLRW ;CLEAR THE WORKING REGISTER
+; =============== DEFINE ========================================================
+SUM_ONE EQU 0X21
+SUM_TWO EQU 0X22
+RESULT_ONE EQU 0X23
+RESULT_TWO EQU 0X24
+; =============== MAIN PROGRAM ==================================================
+PROGRAM:
+MOVWF SUM_ONE ;MOVE THE CONTENT OF THE FILE REGISTER TO THE WORKING REGISTER
+ADDWF SUM_TWO,0 ;ADD THE CONTENT OF THE FILE REGISTER, WITH THE CONTENT OF THE WORKING REGISTER
+AND STORE IT ON THE W REGISTER
+MOVWF RESULT_ONE ;COPY THE CONTENT OF THE WORKING REGISTER ON THE FILE REGISTER
+MOVWF RESULT_TWO ;COPY THE CONTENT OF THE WORKING REGISTER ON THE FILE REGISTER
+END
