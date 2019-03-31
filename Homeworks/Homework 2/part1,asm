@@ -1,0 +1,95 @@
+;*******************************************************************************
+; TITLE : EXERCISE 2.6
+; PROFESSOR: MARTIN DEL BARCO			
+; AUTHOR: VALENZUELA GABRIEL EMANUEL
+; SUBJET: DIGITAL ELECTRONICS II
+; INSTITUTE : FEFYN - UNC
+; DATE: 03-30-2019
+; VERSION: 1.0.0
+;
+; RESUME:
+; THIS PROGRAM GENERATE A DELAY OF 1[s] USING NESTED LOOPS WITH A ERROR OF
+; 1.06%
+;*******************************************************************************			
+#include "p16f887.inc"	;HEADER THAT CONTAINS ALL ADDRESS MEMORY DEFINED BY MI-
+			;CROCHIP
+    LIST P=16F887	;DEFINE THE MICROCONTROLLER TO BE USED.			
+;*******************************************************************************
+; CONFIG1
+    
+; __config 0x3FF1
+ __CONFIG _CONFIG1, _FOSC_XT & _WDTE_OFF & _PWRTE_OFF & _MCLRE_ON & _CP_OFF & _CPD_OFF & _BOREN_ON & _IESO_ON & _FCMEN_ON & _LVP_ON
+; CONFIG2
+; __config 0x3FFF
+ __CONFIG _CONFIG2, _BOR4V_BOR40V & _WRT_OFF
+;===============================================================================
+;			   VARIABLE & CONSTANT DEFINITION 
+COUNTER_ADD EQU 0X20
+OCOUNT_ADD EQU 0X21
+ICOUNT_ADD EQU 0X22
+;===============================================================================
+NESTED_OC SET D'243'
+NESTED_IC SET D'243'
+COUNTER_VAL SET D'7'
+;===============================================================================
+
+;===============================================================================
+;			    ORIGIN PRORGRAM
+    ORG 0X00
+    GOTO PROGRAM
+;===============================================================================
+    
+;===============================================================================
+;			    MAIN PROGRAM
+PROGRAM	ORG 0X05
+	CLRW
+	CLRF COUNTER_ADD
+	CLRF OCOUNT_ADD
+	CLRF ICOUNT_ADD
+	
+	;CLEAR ALL
+	
+	MOVLW COUNTER_VAL
+	MOVWF COUNTER_ADD   
+	
+	MOVLW NESTED_OC
+	MOVWF OCOUNT_ADD    
+	
+	MOVLW NESTED_IC
+	MOVWF ICOUNT_ADD    
+	
+	CALL DELAY	    ;CALL SUBRUTINE
+	GOTO PROGRAM	    ;START AGAIN THE HOLE PROGRAM
+	
+	;TWELVE LINES OF CODE...
+	;CLEAR ALL = 4IC I.E 4uS
+	;THE SETTER, THAT MEANS, THE MOV, EACH ONE HAS
+	;1IC SO, IT'S HAS 6IC EQUIVALENT TO 6uS
+	;CALL AND GOTO SUMS 4IC I.E 4uS
+	;THEREBEFORE, THE MAIN PROGRAM CONSUMES
+	;14IC
+	
+DELAY	DECFSZ COUNTER_ADD,1
+	GOTO OUTER		;GO TO OUTER COUNT COUNTER TIMES
+	CLRF OCOUNT_ADD		;CLEAR 
+	CLRF ICOUNT_ADD		;CLEAR 
+	RETURN			;RETURN TO MAIN PROGRAM
+	
+
+OUTER	
+	DECFSZ OCOUNT_ADD,1 ;DECREMENT THE COUNTER, SKIP IF ZERO
+	GOTO INNER	    ;GO TO INNER COUNT NESTED_OC TIMES
+	MOVLW NESTED_OC	    ;IF IT'S ZERO, I MUST RESTART THE VALUE
+	MOVWF OCOUNT_ADD    ;SET THE OUTER COUNTER
+	GOTO DELAY	    ;COME BACK TO DELAY SUBRUTINE
+	;FROM THE EQUATION:
+	;766 IC = 3*(NESTED_OC-1) + 4 I.E NESTED_OC = 255
+	
+INNER	DECFSZ ICOUNT_ADD   ;DECREMENT THE COUNTER, SKIP IF ZERO
+	GOTO INNER	    ;IF NOT ZERO, START AGAIN
+	MOVLW NESTED_IC	    ;IF IT'S ZERO, I MUST RESTART THE VALUE
+	MOVWF ICOUNT_ADD    ;SET THE INNER COUNTER
+	GOTO OUTER	    ;RETURN TO OUTER
+	;FROM THE EQUATION:
+	;768 IC = 3*(NESTED_IC-1) + 6 I.E NESTED_IC = 255
+	END
